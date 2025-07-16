@@ -1,0 +1,7 @@
+
+> bio-tracker-backend@1.0.0 start
+> node src/server.js
+
+[32minfo[39m: Bio-Tracker API running on port 4000 {"service":"bio-tracker-api","timestamp":"2025-07-13 17:06:14"}
+[32minfo[39m: Environment: development {"service":"bio-tracker-api","timestamp":"2025-07-13 17:06:14"}
+[31merror[39m: Database connection failed: connect ECONNREFUSED 127.0.0.1:5432 {"address":"127.0.0.1","code":"ECONNREFUSED","errno":-111,"port":5432,"service":"bio-tracker-api","stack":"Error: connect ECONNREFUSED 127.0.0.1:5432\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1549:16)","syscall":"connect","timestamp":"2025-07-13 17:06:14"}
