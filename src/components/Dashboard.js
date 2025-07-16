@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/SupabaseAuthContext';
-import { mealsAPI, userAPI } from '../services/api';
+// import { mealsAPI, userAPI } from '../services/api';
 import ExperienceBar from './ExperienceBar';
 import './Dashboard.css';
 
@@ -25,19 +25,13 @@ const Dashboard = () => {
     try {
       // Fetch user stats including XP
       if (user?.id || user?.uid) {
-        try {
-          const statsResponse = await userAPI.getStats(user.id || user.uid);
-          setUserStats(statsResponse);
-        } catch (error) {
-          console.error('Failed to fetch user stats:', error);
-          // Set default stats if API fails
-          setUserStats({
-            totalXp: 0,
-            currentLevel: 1,
-            xpToNextLevel: 100,
-            levelProgress: 0
-          });
-        }
+        // For now, use default stats until backend is set up
+        setUserStats({
+          totalXp: user?.profile?.total_xp || 0,
+          currentLevel: user?.profile?.level || 1,
+          xpToNextLevel: 100,
+          levelProgress: (user?.profile?.total_xp || 0) % 100
+        });
       }
 
       // In a real app, these would be actual API calls

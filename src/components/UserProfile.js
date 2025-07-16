@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/SupabaseAuthContext';
 import ExperienceBar from './ExperienceBar';
-import { userAPI } from '../services/api';
+// import { userAPI } from '../services/api';
 import './UserProfile.css';
 
 const UserProfile = () => {
@@ -27,16 +27,28 @@ const UserProfile = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await userAPI.getProfileWithStats(user.id || user.uid);
-      setProfile(response.profile);
-      setStats(response.stats);
+      // Use data from user context for now
+      const userProfile = user?.profile || {};
+      setProfile({
+        username: user?.email?.split('@')[0] || 'User',
+        avatarUrl: userProfile.avatar_url || '',
+        bio: userProfile.bio || '',
+        level: userProfile.level || 1,
+        totalXp: userProfile.total_xp || 0
+      });
+      setStats({
+        totalMeals: 0,
+        currentStreak: 0,
+        joinDate: new Date().toISOString(),
+        achievements: []
+      });
       setEditForm({
-        username: response.profile.username || '',
-        avatarUrl: response.profile.avatarUrl || '',
-        bio: response.profile.bio || ''
+        username: user?.email?.split('@')[0] || '',
+        avatarUrl: userProfile.avatar_url || '',
+        bio: userProfile.bio || ''
       });
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error setting up profile:', error);
       setError('Failed to load profile');
     } finally {
       setLoading(false);
@@ -82,10 +94,11 @@ const UserProfile = () => {
     try {
       setSaving(true);
       setError(null);
-      const response = await userAPI.updateProfileById(user.id || user.uid, editForm);
+      // For now, just update local state
+      // TODO: Implement Supabase profile update
       setProfile(prev => ({
         ...prev,
-        ...response.profile
+        ...editForm
       }));
       setEditing(false);
     } catch (error) {
