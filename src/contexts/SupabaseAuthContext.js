@@ -91,15 +91,21 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setError(null);
+      console.log('Attempting Supabase login...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase auth error:', error);
+        throw error;
+      }
       
+      console.log('Login successful:', data.user?.email);
       return { user: data.user };
     } catch (err) {
+      console.error('Login error caught:', err);
       setError(err.message);
       throw err;
     }
