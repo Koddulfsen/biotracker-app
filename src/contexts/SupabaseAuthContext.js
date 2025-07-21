@@ -150,14 +150,6 @@ export const AuthProvider = ({ children }) => {
         console.error('Direct API call failed:', directError);
         throw directError;
       }
-      
-      if (error) {
-        console.error('Supabase auth error:', error);
-        throw error;
-      }
-      
-      console.log('Login successful:', data.user?.email);
-      return { user: data.user };
     } catch (err) {
       console.error('Login error caught:', err);
       setError(err.message);
