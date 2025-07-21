@@ -121,11 +121,15 @@ export const AuthProvider = ({ children }) => {
       // Try direct API call as workaround
       console.log('Trying direct API call...');
       try {
-        const authResponse = await fetch(`${supabase.supabaseUrl}/auth/v1/token?grant_type=password`, {
+        // Use hardcoded values since we can't access them from client
+        const SUPABASE_URL = 'https://pxmukjgzrchnlsukdegy.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4bXVramd6cmNobmxzdWtkZWd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MTkzNzYsImV4cCI6MjA2Nzk5NTM3Nn0.O31I8P53_4TyHvqPbAE87kDwcOgSpH2WfvGIzNnZxa0';
+        
+        const authResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'apikey': supabase.supabaseKey,
+            'apikey': SUPABASE_KEY,
           },
           body: JSON.stringify({
             email: credentials.email,
@@ -144,15 +148,7 @@ export const AuthProvider = ({ children }) => {
         return { user: authData.user };
       } catch (directError) {
         console.error('Direct API call failed:', directError);
-        
-        // Fall back to SDK method
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: credentials.email,
-          password: credentials.password,
-        });
-        
-        if (error) throw error;
-        return { user: data.user };
+        throw directError;
       }
       
       if (error) {
