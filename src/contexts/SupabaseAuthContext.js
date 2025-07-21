@@ -118,10 +118,42 @@ export const AuthProvider = ({ children }) => {
         console.error('Direct fetch test failed:', fetchError);
       }
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
+      // Try direct API call as workaround
+      console.log('Trying direct API call...');
+      try {
+        const authResponse = await fetch(`${supabase.supabaseUrl}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabase.supabaseKey,
+          },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        });
+        
+        const authData = await authResponse.json();
+        console.log('Direct API response:', authResponse.status, authData);
+        
+        if (!authResponse.ok) {
+          throw new Error(authData.error_description || authData.msg || 'Authentication failed');
+        }
+        
+        // Use the direct response
+        return { user: authData.user };
+      } catch (directError) {
+        console.error('Direct API call failed:', directError);
+        
+        // Fall back to SDK method
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        });
+        
+        if (error) throw error;
+        return { user: data.user };
+      }
       
       if (error) {
         console.error('Supabase auth error:', error);
