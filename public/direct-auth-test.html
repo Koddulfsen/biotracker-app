@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input { margin: 5px; padding: 5px; }
+        button { padding: 10px 20px; margin: 10px 0; }
+        #result { white-space: pre-wrap; background: #f0f0f0; padding: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Direct Supabase Auth Test</h1>
+    <p>This bypasses all React/SDK code to test authentication directly.</p>
+    
+    <div>
+        <input type="email" id="email" placeholder="Email" value="jensdahl793@gmail.com"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testRegister()">Test Register</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://pxmukjgzrchnlsukdegy.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4bXVramd6cmNobmxzdWtkZWd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MTkzNzYsImV4cCI6MjA2Nzk5NTM3Nn0.O31I8P53_4TyHvqPbAE87kDwcOgSpH2WfvGIzNnZxa0';
+        
+        function log(msg) {
+            document.getElementById('result').textContent += msg + '\n';
+            console.log(msg);
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('Testing login...');
+            log('Email: ' + email);
+            log('Password length: ' + password.length);
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                log('\nResponse Status: ' + response.status);
+                log('Response: ' + JSON.stringify(data, null, 2));
+                
+                if (response.ok) {
+                    log('\n✅ LOGIN SUCCESSFUL!');
+                    log('User ID: ' + data.user?.id);
+                    log('Access Token: ' + (data.access_token ? 'Received' : 'Missing'));
+                } else {
+                    log('\n❌ LOGIN FAILED');
+                    log('Error: ' + (data.error_description || data.msg || 'Unknown error'));
+                }
+            } catch (error) {
+                log('\n❌ FETCH ERROR: ' + error.message);
+                log('This is the same error you see in React!');
+            }
+        }
+        
+        async function testRegister() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('\nTesting registration...');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                log('\nResponse Status: ' + response.status);
+                log('Response: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('\n❌ FETCH ERROR: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
