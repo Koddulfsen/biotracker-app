@@ -28,6 +28,19 @@ const finalUrl = supabaseUrl || fallbackUrl;
 const finalKey = supabaseAnonKey || fallbackKey;
 
 console.warn('Using Supabase URL:', finalUrl === fallbackUrl ? 'FALLBACK (env var failed)' : 'FROM ENV');
+console.log('Final URL being used:', finalUrl);
+console.log('Final Key being used:', finalKey ? 'Key is set' : 'KEY IS MISSING');
 
-// Only create client if we have valid credentials
-export const supabase = createClient(finalUrl, finalKey);
+// Debug the client creation
+let supabase;
+try {
+  console.log('Creating Supabase client...');
+  supabase = createClient(finalUrl, finalKey);
+  console.log('Supabase client created successfully:', supabase);
+  console.log('Auth object:', supabase.auth);
+} catch (error) {
+  console.error('Error creating Supabase client:', error);
+  supabase = null;
+}
+
+export { supabase };

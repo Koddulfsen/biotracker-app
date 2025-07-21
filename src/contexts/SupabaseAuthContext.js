@@ -100,9 +100,24 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log('Attempting Supabase login...');
+      console.log('Supabase client exists?', !!supabase);
+      console.log('Supabase auth exists?', !!supabase?.auth);
+      console.log('Credentials:', { email: credentials.email, passwordLength: credentials.password?.length });
+      
       if (!supabase) {
         throw new Error('Authentication service not available. Please check your connection.');
       }
+      
+      // Test direct fetch to Supabase
+      try {
+        const testUrl = 'https://pxmukjgzrchnlsukdegy.supabase.co/auth/v1/health';
+        console.log('Testing direct fetch to:', testUrl);
+        const testResponse = await fetch(testUrl);
+        console.log('Direct fetch test result:', testResponse.status);
+      } catch (fetchError) {
+        console.error('Direct fetch test failed:', fetchError);
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
