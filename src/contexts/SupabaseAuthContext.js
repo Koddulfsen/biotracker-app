@@ -144,7 +144,28 @@ export const AuthProvider = ({ children }) => {
           throw new Error(authData.error_description || authData.msg || 'Authentication failed');
         }
         
-        // Use the direct response
+        // Store the session and update user state
+        if (authData.access_token) {
+          localStorage.setItem('sb-access-token', authData.access_token);
+          localStorage.setItem('sb-refresh-token', authData.refresh_token);
+          
+          // Update the user state
+          setUser({
+            id: authData.user.id,
+            email: authData.user.email,
+            type: 'personal',
+            tier: 'freemium',
+            profile: {
+              userId: authData.user.id,
+              displayName: authData.user.email.split('@')[0],
+              avatar_url: null,
+              bio: '',
+              total_xp: 0,
+              level: 1
+            }
+          });
+        }
+        
         return { user: authData.user };
       } catch (directError) {
         console.error('Direct API call failed:', directError);
