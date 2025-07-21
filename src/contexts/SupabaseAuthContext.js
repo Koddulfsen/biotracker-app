@@ -20,6 +20,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
+        if (!supabase) {
+          console.error('Supabase client not initialized - check environment variables');
+          setLoading(false);
+          return;
+        }
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Transform Supabase user to match your app's user structure
@@ -47,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase?.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setUser({
           id: session.user.id,
@@ -68,12 +73,15 @@ export const AuthProvider = ({ children }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => subscription?.unsubscribe();
   }, []);
 
   const register = async (userData) => {
     try {
       setError(null);
+      if (!supabase) {
+        throw new Error('Authentication service not available. Please check your connection.');
+      }
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -92,6 +100,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log('Attempting Supabase login...');
+      if (!supabase) {
+        throw new Error('Authentication service not available. Please check your connection.');
+      }
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,

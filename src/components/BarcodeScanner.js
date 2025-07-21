@@ -75,6 +75,13 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
   };
 
   const handleScanSuccess = async (barcode) => {
+    // Validate barcode before processing
+    if (!barcode || typeof barcode !== 'string' || barcode.trim().length === 0) {
+      console.error('Invalid barcode detected:', barcode);
+      setError('Invalid barcode detected. Please try again.');
+      return;
+    }
+    
     // Stop scanning to prevent multiple scans
     await stopScanner();
     setScanning(false);
@@ -85,12 +92,12 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
     }
 
     // Call parent callback with barcode
-    onScanSuccess(barcode);
+    onScanSuccess(barcode.trim());
   };
 
   const handleManualEntry = () => {
     const barcode = prompt('Enter barcode number:');
-    if (barcode && barcode.trim()) {
+    if (barcode && barcode.trim() && barcode.trim().length > 0) {
       onScanSuccess(barcode.trim());
     }
   };

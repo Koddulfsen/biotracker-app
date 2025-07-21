@@ -21,16 +21,35 @@ setInterval(() => {
  * @returns {Promise<Object>} Product information
  */
 export const fetchProductByBarcode = async (barcode) => {
+  // Validate barcode parameter
+  if (!barcode || typeof barcode !== 'string' || barcode.trim() === '') {
+    throw new Error('Invalid barcode: barcode must be a non-empty string');
+  }
+  
+  // Sanitize barcode
+  const sanitizedBarcode = barcode.trim();
+  
   // Check cache first
-  if (apiCache.has(barcode)) {
-    const cached = apiCache.get(barcode);
+  if (apiCache.has(sanitizedBarcode)) {
+    const cached = apiCache.get(sanitizedBarcode);
     if (Date.now() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
   }
 
   try {
-    const response = await fetch(`${OPEN_FOOD_FACTS_API}/product/${barcode}`);
+    const url = `${OPEN_FOOD_FACTS_API}/product/${encodeURIComponent(sanitizedBarcode)}`;
+    console.log('Fetching product from:', url);
+    
+    // Validate URL before fetching
+    try {
+      new URL(url);
+    } catch (urlError) {
+      console.error('Invalid URL constructed:', url);
+      throw new Error('Invalid barcode format');
+    }
+    
+    const response = await fetch(url);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -43,7 +62,7 @@ export const fetchProductByBarcode = async (barcode) => {
     }
 
     // Cache the response
-    apiCache.set(barcode, {
+    apiCache.set(sanitizedBarcode, {
       data: data,
       timestamp: Date.now()
     });
@@ -142,10 +161,17 @@ export const parseProductData = (productData) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchProducts = async (query, page = 1) => {
+  // Validate query parameter
+  if (!query || typeof query !== 'string' || query.trim() === '') {
+    throw new Error('Invalid search query: query must be a non-empty string');
+  }
+  
   try {
-    const response = await fetch(
-      `${OPEN_FOOD_FACTS_API}/search?search_terms=${encodeURIComponent(query)}&page=${page}&page_size=20&sort_by=popularity`
-    );
+    const sanitizedQuery = query.trim();
+    const url = `${OPEN_FOOD_FACTS_API}/search?search_terms=${encodeURIComponent(sanitizedQuery)}&page=${page}&page_size=20&sort_by=popularity`;
+    console.log('Searching products with URL:', url);
+    
+    const response = await fetch(url);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

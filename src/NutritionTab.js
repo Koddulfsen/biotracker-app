@@ -385,6 +385,17 @@ function NutritionTab() {
 
   // Handle barcode scan
   const handleBarcodeScan = async (barcode) => {
+    console.log('Barcode scanned:', barcode, 'Type:', typeof barcode);
+    
+    // Validate barcode input
+    if (!barcode || typeof barcode !== 'string' || barcode.trim() === '') {
+      console.error('Invalid barcode:', { barcode, type: typeof barcode, trimmed: barcode?.trim?.() });
+      setScanError('Invalid barcode detected');
+      setShowBarcodeScanner(false);
+      setScanLoading(false);
+      return;
+    }
+    
     // Check scan limit for free users
     if (currentUser && userProfile && userProfile.subscription.plan === 'freemium') {
       if (userProfile.subscription.scansToday >= 5) {
@@ -400,7 +411,7 @@ function NutritionTab() {
 
     try {
       // Fetch product data from Open Food Facts
-      const productData = await fetchProductByBarcode(barcode);
+      const productData = await fetchProductByBarcode(barcode.trim());
       const parsedFood = parseProductData(productData);
 
       // Create a food name with brand
