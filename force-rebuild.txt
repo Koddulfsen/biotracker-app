@@ -1,0 +1,2 @@
+Force rebuild at: 2025-07-21 12:00:00
+This file forces Vercel to rebuild with fresh environment variables.
