@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/SupabaseAuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
+import SimpleLogin from './components/SimpleLogin';
 import Dashboard from './components/Dashboard';
 import NutritionTab from './NutritionTab';
 import UserProfile from './components/UserProfile';
@@ -55,6 +56,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/simple-login" element={<SimpleLogin />} />
           <Route path="/register" element={<Register />} />
           
           {/* Protected Routes */}
